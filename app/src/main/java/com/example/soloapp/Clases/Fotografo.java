@@ -2,7 +2,9 @@ package com.example.soloapp.Clases;
 
 import com.google.firebase.firestore.GeoPoint;
 
-public class Fotografo {
+import java.io.Serializable;
+
+public class Fotografo  implements Serializable {
     private String nombre;
     private String apellido;
     private String numero;
@@ -11,25 +13,14 @@ public class Fotografo {
     private double latitud;
     private double longitud;
     private boolean activo;
+    private float rating;
+    private int portfolioSize;
+    private String descripcion;
+    private double precio5;
+    private double precio15;
+    private double precio25;
 
-    @Override
-    public String toString() {
-        return "Fotografo{" +
-                "nombre='" + nombre + '\'' +
-                ", apellido='" + apellido + '\'' +
-                ", numero='" + numero + '\'' +
-                ", correo='" + correo + '\'' +
-                ", id='" + id + '\'' +
-                ", latitud=" + latitud +
-                ", longitud=" + longitud +
-                ", activo=" + activo +
-                '}';
-    }
-
-    public Fotografo() {
-    }
-
-    public Fotografo(String nombre, String apellido, String numero, String correo, String id, double latitud, double longitud, boolean activo) {
+    public Fotografo(String nombre, String apellido, String numero, String correo, String id, double latitud, double longitud, boolean activo, float rating, int portfolioSize, String descripcion, double precio5, double precio15, double precio25) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.numero = numero;
@@ -38,6 +29,63 @@ public class Fotografo {
         this.latitud = latitud;
         this.longitud = longitud;
         this.activo = activo;
+        this.rating = rating;
+        this.portfolioSize = portfolioSize;
+        this.descripcion = descripcion;
+        this.precio5 = precio5;
+        this.precio15 = precio15;
+        this.precio25 = precio25;
+    }
+
+    public double getPrecio5() {
+        return precio5;
+    }
+
+    public void setPrecio5(double precio5) {
+        this.precio5 = precio5;
+    }
+
+    public double getPrecio15() {
+        return precio15;
+    }
+
+    public void setPrecio15(double precio15) {
+        this.precio15 = precio15;
+    }
+
+    public double getPrecio25() {
+        return precio25;
+    }
+
+    public void setPrecio25(double precio25) {
+        this.precio25 = precio25;
+    }
+
+    public Fotografo() {
+    }
+
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public int getPortfolioSize() {
+        return portfolioSize;
+    }
+
+    public void setPortfolioSize(int portfolioSize) {
+        this.portfolioSize = portfolioSize;
+    }
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
     }
 
     public boolean getActivo() {

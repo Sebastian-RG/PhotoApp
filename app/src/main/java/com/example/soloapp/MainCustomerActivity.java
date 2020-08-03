@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.soloapp.Adapters.SesionRecyclerAdapter;
+import com.example.soloapp.Clases.Cliente;
+import com.example.soloapp.Clases.Fotografo;
 import com.example.soloapp.Clases.Sesion;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -30,6 +32,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -44,13 +47,16 @@ public class MainCustomerActivity extends AppCompatActivity implements FirebaseA
 
     private SesionRecyclerAdapter mAdapter;
     private RecyclerView mRecyclerView;
-    private Bitmap[] mImages;
     private Button buscarFotografo;
     private static final String TAG = "Sebastian";
     private FirebaseFirestore DBfirebase = FirebaseFirestore.getInstance();
     private ArrayList<Sesion> collectionSesiones = new ArrayList<Sesion>();
     private Sesion[] mLista;
     private int FUENTE_MAIN = 1;
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private String uid;
+    Cliente cliente;
+    Fotografo fotografo;
 //    SesionRecyclerAdapter sesionRecyclerAdapter;
 
     @Override
@@ -81,7 +87,6 @@ public class MainCustomerActivity extends AppCompatActivity implements FirebaseA
                 Log.e(TAG, "onFailure: fail DBfirebase get sesiones", e.getCause() );
             }
         });
-        
     }
     
     
@@ -91,7 +96,7 @@ public class MainCustomerActivity extends AppCompatActivity implements FirebaseA
             aux = document.toObject(Sesion.class);
             aux.setId(document.getId());
             collectionSesiones.add(aux);
-            Log.i(TAG, "setCollectionSesiones: se entro a el for dentro de set Collection, foto: "+ aux.getIdFotografo() +" ses id: "+ aux.getId());
+            Log.i(TAG, "setCollectionSesiones: se entro a el for dentro de set Collection, fotografo: "+ aux.getIdFotografo() +" ses id: "+ aux.getId());
 
         }
         mLista = collectionSesiones.toArray(new Sesion[collectionSesiones.size()]);
@@ -107,7 +112,7 @@ public class MainCustomerActivity extends AppCompatActivity implements FirebaseA
         mRecyclerView = findViewById(R.id.main_recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(MainCustomerActivity.this));
         //mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        mAdapter = new SesionRecyclerAdapter(mLista, mImages, MainCustomerActivity.this, FUENTE_MAIN);
+        mAdapter = new SesionRecyclerAdapter(mLista,MainCustomerActivity.this, FUENTE_MAIN);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
@@ -124,13 +129,76 @@ public class MainCustomerActivity extends AppCompatActivity implements FirebaseA
                 Log.i(TAG, "onItemClick: Se empezo la actividad VerSesionActivity");
 
             }
+
+            @Override
+            public void onButtonClick(int position) {
+
+                getFotografo(mLista[position].getIdFotografo());
+
+
+            }
         });
 
     }
 
     public void buscarFotografo(View view){ // BOTON BUSCAR FOTOGRAFO
        // Intent intent = new Intent(this, ProfileActivity.class);
+        getCliente();
+        
        // startActivity(intent);
+    }
+    private void getCliente(){
+        DBfirebase.collection("users").document(uid).get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        cliente = documentSnapshot.toObject(Cliente.class);
+                        irABuscarFotografo();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "onFailure: hubo un error obteniendo el usuario de la DB",e.getCause() );
+                    }
+                });
+
+    }
+
+    private void getFotografo(String fid){
+        DBfirebase.collection("fotografos").document(fid).get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        fotografo = documentSnapshot.toObject(Fotografo.class);
+                        irAVerPortfolio();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "onFailure: hubo un error obteniendo el fotografo de la DB",e.getCause() );
+                    }
+                });
+    }
+
+    private void irAVerPortfolio() {
+        Intent intent;
+        intent = new Intent(MainCustomerActivity.this, PerfilFotografoActivity.class);
+        intent.putExtra("fotografo", fotografo);
+        startActivity(intent);
+        Log.i(TAG, "buscarFotografo: Se empezo la actividad BuscarFotografoActivity");
+    }
+
+    private void irABuscarFotografo() {
+        if(cliente.getNumero().isEmpty() || cliente.getNombre().isEmpty() || cliente.getApellido().isEmpty()){
+            Toast.makeText(this, "Por favor ingrese sus datos personales primero", Toast.LENGTH_LONG).show();
+        }else{
+            Intent intent;
+            intent = new Intent(MainCustomerActivity.this, BuscarFotografoActivity.class);
+            startActivity(intent);
+            Log.i(TAG, "buscarFotografo: Se empezo la actividad BuscarFotografoActivity");
+        }
     }
 
 
@@ -177,6 +245,7 @@ public class MainCustomerActivity extends AppCompatActivity implements FirebaseA
     protected void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(this);
+        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         getSesiones();
     }
 

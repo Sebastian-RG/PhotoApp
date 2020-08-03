@@ -36,6 +36,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:19.1.1' //Firebase Storage
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
     implementation 'com.github.bumptech.glide:glide:4.11.0' // GLIDE for photos
+    implementation 'com.google.android.gms:play-services-location:15.0.1' //Location Services
 
     // FirebaseUI for Cloud Firestore
     implementation 'com.firebaseui:firebase-ui-firestore:6.3.0'

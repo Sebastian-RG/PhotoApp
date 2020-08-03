@@ -3,40 +3,49 @@ package com.example.soloapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.soloapp.Adapters.SesionRecyclerAdapter;
+import com.example.soloapp.Adapters.PerfilRecyclerAdapter;
 import com.example.soloapp.Adapters.VerSesionRecyclerAdapter;
-import com.example.soloapp.Clases.Sesion;
-import com.firebase.ui.auth.AuthUI;
+import com.example.soloapp.Clases.Fotografo;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class VerSesionActivity extends AppCompatActivity {
+public class PerfilFotografoActivity extends AppCompatActivity {
 
-    private VerSesionRecyclerAdapter mAdapter;
+    Fotografo fotografo;
+    private PerfilRecyclerAdapter mAdapter;
     private RecyclerView mRecyclerView;
     private static final String TAG = "Sebastian";
     private FirebaseFirestore DBfirebase = FirebaseFirestore.getInstance();
-    private Sesion sesion;
+    TextView descripcion;
+    RatingBar rating;
+    TextView contacto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ver_sesion);
-        sesion = (Sesion) getIntent().getSerializableExtra("item");
-        setTitle("Sesion " + DateFormat.format("d/MM/yyyy", sesion.getFecha()).toString());
-        Log.i(TAG, "onCreate: id sesion a ver: " + sesion.getId());
+        setTitle("Portfolio");
+        setContentView(R.layout.activity_perfil_fotografo);
+        fotografo = (Fotografo) getIntent().getSerializableExtra("fotografo");
+        contacto = findViewById(R.id.textView_PerfilFotografo_numero);
+        rating = findViewById(R.id.ratingBar_PerfilFotografo);
+        descripcion = findViewById(R.id.TextView_PerfilFotografo_Descripcion);
+        descripcion.setText(fotografo.getDescripcion());
+        rating.setIsIndicator(true);
+        rating.setRating(fotografo.getRating());
+        contacto.setText(fotografo.getNumero());
+
     }
+
 
     @Override
     protected void onStart() {
@@ -44,28 +53,14 @@ public class VerSesionActivity extends AppCompatActivity {
         buildRecyclerView();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.i(TAG, "onStop: Se termino el VerSesionAct");
-    }
-
     public void buildRecyclerView(){
         Log.i(TAG, "buildRecyclerView: Se entro a build recycler view");
-        mRecyclerView = findViewById(R.id.ver_sesion_rv);
-//        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(VerSesionActivity.this));
-        mAdapter = new VerSesionRecyclerAdapter(VerSesionActivity.this, sesion);
+        mRecyclerView = findViewById(R.id.recyclerView_PerfilFotografo);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(PerfilFotografoActivity.this));
+        mAdapter = new PerfilRecyclerAdapter(PerfilFotografoActivity.this, fotografo);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-        mAdapter.setOnClickListener(new VerSesionRecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Toast.makeText(VerSesionActivity.this, "Descargando imagen "+position + "...", Toast.LENGTH_SHORT).show();
-                //todo que se descargue
-            }
-        });
     }
 
     @Override
@@ -84,6 +79,4 @@ public class VerSesionActivity extends AppCompatActivity {
             default:
                 return true;
         }}
-
-
 }

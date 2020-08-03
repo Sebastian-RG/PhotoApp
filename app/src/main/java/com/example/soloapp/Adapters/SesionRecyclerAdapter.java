@@ -33,21 +33,20 @@ public class SesionRecyclerAdapter extends RecyclerView.Adapter<SesionRecyclerAd
 
     private static final String TAG = "Sebastian";
     private Sesion[] data;
-    private Bitmap[] foto;
     private Context context;
     private OnItemClickListener mListener;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private int fuente;
 
-    public SesionRecyclerAdapter(Sesion[] data, Bitmap[] foto, Context context, int fuente) {
+    public SesionRecyclerAdapter(Sesion[] data, Context context, int fuente) {
         this.data = data;
-        this.foto = foto;
         this.context = context;
         this.fuente = fuente;
     }
 
     public interface OnItemClickListener{
         void onItemClick(int position);
+        void onButtonClick(int position);
     }
 
     public void setOnClickListener(OnItemClickListener listener){
@@ -59,9 +58,9 @@ public class SesionRecyclerAdapter extends RecyclerView.Adapter<SesionRecyclerAd
     public SesionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).inflate(R.layout.rv_sesion_main, parent, false);
         SesionViewHolder sesionViewHolder = new SesionViewHolder(itemView, mListener);
-        if(fuente == 1){
-            sesionViewHolder.boton.setVisibility(View.GONE);
-        }
+//        if(fuente == 1){
+//            sesionViewHolder.boton.setVisibility(View.GONE);
+//        }
         return sesionViewHolder;
     }
 
@@ -113,6 +112,17 @@ public class SesionRecyclerAdapter extends RecyclerView.Adapter<SesionRecyclerAd
                     }
                 }
             });
+            boton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(listener != null){
+                        int position = getAdapterPosition();
+                        if(position != RecyclerView.NO_POSITION){
+                            listener.onButtonClick(position);
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -127,7 +137,7 @@ public class SesionRecyclerAdapter extends RecyclerView.Adapter<SesionRecyclerAd
 //        holder.rv_nombre_main.setText(model.getFotografo().getNombre());
 //        CharSequence dateCharSeq = DateFormat.format("EEEE, d MMM, yyyy", model.getFecha());
 //        holder.rv_fecha_main.setText(dateCharSeq);
-//        // todo holder.rv_foto_main.setImageBitmap();
+//          holder.rv_foto_main.setImageBitmap();
 //    }
 //
 //    @NonNull
