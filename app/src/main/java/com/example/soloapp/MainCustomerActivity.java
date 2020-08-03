@@ -245,8 +245,10 @@ public class MainCustomerActivity extends AppCompatActivity implements FirebaseA
     protected void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(this);
-        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        getSesiones();
+        if(FirebaseAuth.getInstance().getCurrentUser()!= null){
+            uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            getSesiones();
+        }
     }
 
     @Override
